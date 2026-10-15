@@ -1,0 +1,10 @@
+import { readFile, writeFile } from 'node:fs/promises';
+const root = new URL('../', import.meta.url);
+const read = (path) => readFile(new URL(path, root), 'utf8');
+const pkg = JSON.parse(await read('package.json'));
+const model = (await read('src/model.js')).replace(/^export /gm, '');
+const css = await read('src/card.css');
+const card = await read('src/card.js');
+const result = `/* ha-feiertage-serbien v${pkg.version} | MIT | AshenSage */\n(() => {\n"use strict";\nconst VERSION = ${JSON.stringify(pkg.version)};\nconst CARD_CSS = ${JSON.stringify(css)};\n${model}\n${card}\n})();\n`;
+await writeFile(new URL('ha-feiertage-serbien.js', root), result);
+console.log(`Built ha-feiertage-serbien.js v${pkg.version} (${Buffer.byteLength(result)} bytes)`);
